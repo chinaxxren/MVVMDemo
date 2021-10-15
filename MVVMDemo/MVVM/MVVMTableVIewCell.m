@@ -85,8 +85,13 @@
     RAC(self.titleLabel, text) = RACObserve(self, cellModel.titleStr);
     RAC(self.numLabel, text) = RACObserve(self, cellModel.numStr);
 
+    [[self.delBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(id x) {
+        NSLog(@"delete >>>>>");
+        [self.viewModel.deleteCommand execute:@(self.indexPath.row)];
+    }];
+
     [[self.addBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(id x) {
-        NSLog(@">>>>>");
+        NSLog(@"add >>>>>");
         [self.cellModel.addCommand execute:nil];
     }];
 }

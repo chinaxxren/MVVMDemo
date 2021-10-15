@@ -10,7 +10,8 @@
 
 @interface ViewModel ()
 
-@property(nonatomic, strong, readwrite) RACCommand *requestCommand;
+@property(nonatomic, strong, readwrite) RACCommand *loadCommand;
+@property(nonatomic, strong, readwrite) RACCommand *deleteCommand;
 @property(nonatomic, strong, readwrite) NSMutableArray *mulArr;//请求获取到的数据源
 
 @end
@@ -22,14 +23,15 @@
     if (self) {
         self.mulArr = [[NSMutableArray alloc] initWithCapacity:0];
         [self loadRequestData];
+        [self deleteRequestData];
     }
     return self;
 }
 
 - (void)loadRequestData {
-    self.requestCommand = [[RACCommand alloc] initWithSignalBlock:^RACSignal *(id input) {
+    self.loadCommand = [[RACCommand alloc] initWithSignalBlock:^RACSignal *(id input) {
         /**获取传递过来的参数，可以用于请求数据*/
-        NSLog(@"input==%@", input);
+        NSLog(@"load==>%@", input);
         return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
             /**模拟网络请求*/
@@ -47,6 +49,31 @@
                     self.dataArr = [self.mulArr copy];
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [subscriber sendNext:@(YES)];//发送请求成功标识，当然也可发送数据self.dataArr, 如果请求失败也可发送失败标识
+                        [subscriber sendCompleted];//发送完成标识
+                    });
+                });
+            });
+            return [RACDisposable disposableWithBlock:^{
+            }];
+        }];
+    }];
+}
+
+- (void)deleteRequestData {
+    self.deleteCommand = [[RACCommand alloc] initWithSignalBlock:^RACSignal *(id input) {
+        /**获取传递过来的参数，可以用于请求数据*/
+        NSLog(@"delete==>%@", input);
+        return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
+
+            /**模拟网络请求*/
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (0.5f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                dispatch_queue_t queue = dispatch_queue_create("myQueue", DISPATCH_QUEUE_CONCURRENT);
+                dispatch_async(queue, ^{
+                    NSNumber *index = (NSNumber *) input;
+                    [self.mulArr removeObjectAtIndex:[index integerValue]];
+                    self.dataArr = [self.mulArr copy];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [subscriber sendNext:@(3)];//发送请求成功标识，当然也可发送数据self.dataArr, 如果请求失败也可发送失败标识
                         [subscriber sendCompleted];//发送完成标识
                     });
                 });

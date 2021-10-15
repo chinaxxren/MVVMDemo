@@ -31,12 +31,22 @@
 - (void)iniData {
     self.viewModel = [[ViewModel alloc] init];
     // 发送请求
-    RACSignal *signal = [self.viewModel.requestCommand execute:@{@"page": @"1"}];
-    [signal subscribeNext:^(id success) {
-        NSLog(@"x=======%@", success);
+    RACSignal *loadSignal = [self.viewModel.loadCommand execute:@{@"page": @"1"}];
+    [loadSignal subscribeNext:^(id success) {
+        NSLog(@"load result=======>%@", success);
         if ([success boolValue] == 1) {//请求成功
             [self.mainTabelView reloadData];
         }
+    }];
+
+    [self.viewModel.deleteCommand.executionSignals subscribeNext:^(RACSignal *signal) {;
+        [signal subscribeNext:^(id success) {
+            NSLog(@"delete result=======>%@", success);
+            if ([success integerValue] == 3) {//请求成功
+                NSLog(@"delete result success");
+                [self.mainTabelView reloadData];
+            }
+        }];
     }];
 }
 

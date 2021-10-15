@@ -15,7 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ViewModel : NSObject
 
 //发送数据请求的Rac，可以去订阅获取 请求结果
-@property(nonatomic, strong, readonly) RACCommand *requestCommand;
+@property(nonatomic, strong, readonly) RACCommand *loadCommand;
+@property(nonatomic, strong, readonly) RACCommand *deleteCommand;
 @property(nonatomic, strong) NSArray *dataArr;//这里不能用NSMutableArray，因为NSMutableArray不支持KVO，不能被RACObserve
 
 //返回子级对象的ViewModel
