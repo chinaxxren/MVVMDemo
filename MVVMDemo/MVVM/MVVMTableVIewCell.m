@@ -6,7 +6,10 @@
 //
 
 #import "MVVMTableVIewCell.h"
+
 #import <Masonry/Masonry.h>
+
+#import "ViewModel.h"
 
 @interface MVVMTableVIewCell ()
 
@@ -14,7 +17,9 @@
 @property(nonatomic, strong) UILabel *numLabel;
 @property(nonatomic, strong) UIButton *addBtn;
 @property(nonatomic, strong) UIButton *delBtn;
-@property(nonatomic, assign) NSInteger index;
+@property(nonatomic, strong) CellModel *cellModel;
+@property(nonatomic, strong) ViewModel *viewModel;
+@property(nonatomic, strong) NSIndexPath *indexPath;
 
 @end
 
@@ -48,7 +53,6 @@
     [self.contentView addSubview:_numLabel];
 
     [_numLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-
         make.centerY.equalTo(self.contentView);
         make.right.mas_offset(-130);
     }];
@@ -85,6 +89,12 @@
         NSLog(@">>>>>");
         [self.cellModel.addCommand execute:nil];
     }];
+}
+
+- (void)bind:(ViewModel *)viewModel indexPath:(NSIndexPath *)indexPath {
+    self.viewModel = viewModel;
+    self.indexPath = indexPath;
+    self.cellModel = [viewModel itemViewModelForIndex:indexPath.row];
 }
 
 @end

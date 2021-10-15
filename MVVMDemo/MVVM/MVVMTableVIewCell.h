@@ -9,11 +9,13 @@
 #import <UIKit/UIKit.h>
 #import "CellModel.h"
 
+@class ViewModel;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MVVMTableVIewCell : UITableViewCell
 
-@property(nonatomic, strong) CellModel *cellModel;
+- (void)bind:(ViewModel *)viewModel indexPath:(NSIndexPath *)indexPath;
 
 @end
 

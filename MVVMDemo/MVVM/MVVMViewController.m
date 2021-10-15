@@ -63,7 +63,7 @@
     }
 
     //更新cell UI 数据
-    cell.cellModel = [self.viewModel itemViewModelForIndex:indexPath.row];
+    [cell bind:self.viewModel indexPath:indexPath];
 
     return cell;
 }
