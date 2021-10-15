@@ -39,14 +39,48 @@
         }
     }];
 
-    [self.viewModel.deleteCommand.executionSignals subscribeNext:^(RACSignal *signal) {;
-        [signal subscribeNext:^(id success) {
-            NSLog(@"delete result=======>%@", success);
-            if ([success integerValue] == 3) {//请求成功
-                NSLog(@"delete result success");
-                [self.mainTabelView reloadData];
-            }
-        }];
+    /**
+     *  RACCommand使用注意
+     *  1、RACCommand内部必须返回RACSignal
+     *  2、executionSignals信号中的信号，一开始获取不到内部信号
+     *      2.1 使用switchToLatest:获取内部信号
+     *      2.2 使用execute:获取内部信号
+     *  3、executing判断是否正在执行
+     *      3.1 第一次不准确，需要skip:跳过
+     *      3.2 一定要记得sendCompleted，否则永远不会执行完成
+     *  4、通过执行execute，执行command的block
+     */
+    [[self.viewModel.deleteCommand.executing skip:1] subscribeNext:^(NSNumber *_Nullable x) {
+        if (x.boolValue) {
+            NSLog(@"x = %@ 正在执行", x);
+        } else {
+            NSLog(@"x = %@ 执行完成", x);
+        }
+    }];
+
+    //错误信号
+    [self.viewModel.deleteCommand.errors subscribeNext:^(NSError *_Nullable x) {
+        NSLog(@"delete errors == %@", x);
+    }];
+
+//    [self.viewModel.deleteCommand.executionSignals subscribeNext:^(RACSignal *signal) {;
+//        [signal subscribeNext:^(id success) {
+//            NSLog(@"delete result=======>%@", success);
+//            if ([success integerValue] == 3) {//请求成功
+//                NSLog(@"delete result success");
+//                [self.mainTabelView reloadData];
+//            }
+//        }];
+//    }];
+
+    //获取最新信号的值
+    [self.viewModel.deleteCommand.executionSignals.switchToLatest subscribeNext:^(id success) {
+        //4，打印信号中的值
+        NSLog(@"delete result=======>%@", success);
+        if ([success integerValue] == 3) {//请求成功
+            NSLog(@"delete result success");
+            [self.mainTabelView reloadData];
+        }
     }];
 }
 

@@ -58,7 +58,7 @@
     }];
 
     _delBtn = [UIButton new];
-    [_delBtn setTitle:@"删除" forState:UIControlStateNormal];
+    [_delBtn setTitle:@"delete" forState:UIControlStateNormal];
     [_delBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
     [self.contentView addSubview:_delBtn];
 
@@ -70,7 +70,7 @@
     }];
 
     _addBtn = [UIButton new];
-    [_addBtn setTitle:@"增加" forState:UIControlStateNormal];
+    [_addBtn setTitle:@"add" forState:UIControlStateNormal];
     [_addBtn setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
     [self.contentView addSubview:_addBtn];
 
@@ -86,12 +86,12 @@
     RAC(self.numLabel, text) = RACObserve(self, cellModel.numStr);
 
     [[self.delBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(id x) {
-        NSLog(@"delete >>>>>");
+        NSLog(@"click delete button");
         [self.viewModel.deleteCommand execute:@(self.indexPath.row)];
     }];
 
     [[self.addBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(id x) {
-        NSLog(@"add >>>>>");
+        NSLog(@"click add button");
         [self.cellModel.addCommand execute:nil];
     }];
 }

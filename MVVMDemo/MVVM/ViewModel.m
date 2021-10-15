@@ -46,6 +46,8 @@
                         model.Id = i;
                         [self.mulArr addObject:model];
                     }
+                    
+                    // 方便监听数据变化
                     self.dataArr = [self.mulArr copy];
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [subscriber sendNext:@(YES)];//发送请求成功标识，当然也可发送数据self.dataArr, 如果请求失败也可发送失败标识
@@ -60,6 +62,7 @@
 }
 
 - (void)deleteRequestData {
+
     self.deleteCommand = [[RACCommand alloc] initWithSignalBlock:^RACSignal *(id input) {
         /**获取传递过来的参数，可以用于请求数据*/
         NSLog(@"delete==>%@", input);
@@ -70,11 +73,18 @@
                 dispatch_queue_t queue = dispatch_queue_create("myQueue", DISPATCH_QUEUE_CONCURRENT);
                 dispatch_async(queue, ^{
                     NSNumber *index = (NSNumber *) input;
-                    [self.mulArr removeObjectAtIndex:[index integerValue]];
-                    self.dataArr = [self.mulArr copy];
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        [subscriber sendNext:@(3)];//发送请求成功标识，当然也可发送数据self.dataArr, 如果请求失败也可发送失败标识
-                        [subscriber sendCompleted];//发送完成标识
+                        if ([index integerValue] == 3) {
+                            [self.mulArr removeObjectAtIndex:[index integerValue]];
+                            self.dataArr = [self.mulArr copy];
+                            //发送信号 发送请求成功标识，当然也可发送数据self.dataArr, 如果请求失败也可发送失败标识
+                            [subscriber sendNext:index];
+                            //发送完成标识,一定要sendCompleted  不然command.executing无法接收到信号停止的动作
+                            [subscriber sendCompleted];
+                        } else {
+                            NSError *error = [NSError errorWithDomain:@"mvvm" code:0 userInfo:@{@"msg":@"error index"}];
+                            [subscriber sendError:error];
+                        }
                     });
                 });
             });
